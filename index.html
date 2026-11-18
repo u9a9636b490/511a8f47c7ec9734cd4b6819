@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>GES午餐會11月30日(一)</title>
+<style>
+:root{
+  --bg:#faf7f0; --card:#fff; --ink:#2b2a26; --mute:#7a766b; --line:#e6e0d2;
+  --acc:#e8710a; --acc-soft:#fff1e3; --ok:#2f7d4f; --warn:#b3261e;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:600px;margin:0 auto;padding:16px 14px 110px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+h1{font-size:20px;margin:0}
+.dots{display:flex;gap:6px;margin:6px 0 16px}
+.dots i{flex:1;height:5px;border-radius:3px;background:var(--line)}
+.dots i.on{background:var(--acc)}
+h2{font-size:18px;margin:4px 0 2px}
+.sub{color:var(--mute);font-size:14px;margin:0 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;margin-bottom:14px}
+.card{position:relative;background:var(--card);border:2px solid var(--line);border-radius:12px;padding:10px 6px 8px;text-align:center;cursor:pointer;font:inherit;color:inherit;min-height:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.card .ic{font-size:26px;line-height:1.1}
+.card .n{font-size:15px;font-weight:600}
+.card .e{font-size:11px;color:var(--mute)}
+.card.sel{border-color:var(--acc);background:var(--acc-soft)}
+.card.sel::after{content:"✓";position:absolute;top:4px;right:7px;color:var(--acc);font-weight:700}
+.card.dis{opacity:.35;cursor:not-allowed}
+.badges{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;margin-top:3px}
+.b{font-size:10.5px;padding:1px 6px;border-radius:9px;background:#eee;color:#555}
+.b.add{background:#fde7e4;color:var(--warn)}
+.b.ltd{background:#fff3c4;color:#8a6100}
+.b.veg{background:#e1f3e8;color:var(--ok)}
+.b.hot{background:#ffe4cc;color:#a14a00}
+.note{background:#fff;border:1px dashed var(--line);border-radius:10px;padding:8px 10px;font-size:13.5px;color:var(--mute);margin-bottom:12px}
+.counter{display:inline-block;background:var(--acc);color:#fff;border-radius:12px;padding:1px 10px;font-size:14px;margin-left:6px}
+.counter.full{background:var(--ok)}
+input[type=text],textarea{width:100%;font:inherit;padding:11px 12px;border:2px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+input[type=text]:focus,textarea:focus{outline:none;border-color:var(--acc)}
+textarea{min-height:120px;resize:vertical}
+.nav{position:fixed;left:0;right:0;bottom:0;background:rgba(250,247,240,.96);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom))}
+.nav .in{max-width:600px;margin:0 auto;display:flex;gap:10px}
+button.btn{flex:1;font:inherit;font-weight:600;padding:12px;border-radius:12px;border:2px solid var(--acc);background:var(--acc);color:#fff;cursor:pointer}
+button.btn.ghost{background:#fff;color:var(--acc)}
+button.btn:disabled{opacity:.4;cursor:not-allowed}
+button.btn.small{flex:none;padding:7px 12px;font-size:14px}
+.sum{background:#fff;border:1px solid var(--line);border-radius:12px;padding:4px 14px;margin-bottom:12px}
+.sum div{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.sum div:last-child{border:0}
+.sum span:first-child{flex:none;width:58px;color:var(--mute);font-size:14px}
+.link{background:none;border:0;color:var(--mute);font:inherit;font-size:13px;text-decoration:underline;cursor:pointer;padding:4px}
+table{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff}
+th,td{border:1px solid var(--line);padding:6px 7px;text-align:left;vertical-align:top}
+th{background:#f3eee1;white-space:nowrap}
+.tw{overflow-x:auto;margin-bottom:14px}
+.err{color:var(--warn);font-size:13px}
+.kv{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px}
+.kv span{background:#fff;border:1px solid var(--line);border-radius:9px;padding:3px 10px;font-size:14px}
+.kv b{color:var(--acc)}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#2b2a26;color:#fff;padding:8px 16px;border-radius:20px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+label.chk{display:flex;align-items:center;gap:8px;margin:8px 0;font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>GES午餐會11月30日(一)</h1>
+  </header>
+  <div id="app"></div>
+</div>
+<div class="nav" id="nav"><div class="in" id="navIn"></div></div>
+<div class="toast" id="toast"></div>
+
+<!-- ============ 純邏輯（可單獨測試）============ -->
+<script id="logic">
+/* 菜單資料。tag: add=加購, ltd=限量, veg=素別, hot=現做 */
+const MENU = {
+  bases: [
+    {n:'糙米', e:'Brown Rice', i:'🍚'},
+    {n:'白米', e:'White Rice', i:'🍚', tags:[['ltd','限量']]},
+    {n:'生菜', e:'Salad', i:'🥬'},
+    {n:'白米+菜各半', e:'Half & Half', i:'🍚🥬', tags:[['ltd','限量']]},
+    {n:'糙米+菜各半', e:'Half & Half', i:'🍚🥬'},
+    {n:'無基底', e:'No base', i:'🚫', tags:[['veg','配菜可多 1 樣']]}
+  ],
+  tops: [
+    {n:'紅蘿蔔',e:'Carrot',i:'🥕'},{n:'番茄',e:'Tomato',i:'🍅'},{n:'蜜香柑橘',e:'Honey Citrus',i:'🍊'},
+    {n:'小黃瓜',e:'Cucumber',i:'🥒'},{n:'花椰菜',e:'Broccoli',i:'🥦'},{n:'牛蒡絲',e:'Burdock Root',i:'🌿'},
+    {n:'毛豆仁',e:'Edamame',i:'🫛'},{n:'洋蔥',e:'Onion',i:'🧅'},{n:'杏鮑菇',e:'Mushroom',i:'🍄'},
+    {n:'水煮蛋',e:'Egg',i:'🥚'},{n:'玉米',e:'Corn',i:'🌽'},{n:'玉米筍',e:'Baby Corn',i:'🌽'},
+    {n:'黑豆',e:'Black Bean',i:'🫘'},{n:'豆腐',e:'Tofu (Non-Gmo)',i:'⬜'},{n:'地瓜泥',e:'Sweet Potato',i:'🍠'},
+    {n:'菠菜',e:'Spinach',i:'🥬'},{n:'鷹嘴豆',e:'Chickpea',i:'🟡',tags:[['veg','NEW']]},
+    {n:'每日驚喜',e:'Daily Surprise',i:'❓'},{n:'老闆幫選',e:'Random',i:'🎲'}
+  ],
+  proteins: [
+    {n:'無主食/蔬食',e:'Vegetarian',i:'🚫',tags:[['veg','配菜 6 樣']]},
+    {n:'三杯杏鮑菇',e:'Saute Mushroom',i:'🍄',tags:[['veg','五辛素']]},
+    {n:'雞胸肉',e:'Chicken',i:'🍗'},
+    {n:'燒肉牛',e:'Beef Yakiniku',i:'🥩',bbq:true},
+    {n:'燒肉豬',e:'Pork Yakiniku',i:'🥓',bbq:true},
+    {n:'鮮蝦',e:'Shrimp',i:'🍤'},
+    {n:'煙燻鴨胸',e:'Smoked duck breast',i:'🦆'},
+    {n:'生鮭魚',e:'Salmon',i:'🍣'},
+    {n:'炙燒干貝',e:'Scallop',i:'🐚',tags:[['ltd','2 顆']]}
+  ],
+  sauces: [
+    {n:'無醬料',e:'No Sauce',i:'🚫'},
+    {n:'和風柚子',e:'Yuzu Shoyu',i:'🍋',tags:[['veg','全素']]},
+    {n:'百香果優格',e:'Passionfruit Yogurt',i:'🥭',tags:[['veg','蛋奶素']]},
+    {n:'咖哩優格',e:'Curry Yogurt',i:'🍛',tags:[['veg','蛋奶素'],['b','五辛']]},
+    {n:'日式胡麻',e:'Sesame Dressing',i:'🥜',tags:[['b','五辛']]},
+    {n:'辣蟹風味醬',e:'Chilli Crab Sauce',i:'🌶️',tags:[['b','五辛'],['hot','辣']]},
+    {n:'辣味美乃滋',e:'Spicy Mayo',i:'🌶️',tags:[['b','五辛'],['hot','辣']]},
+    {n:'每日驚喜',e:'Daily Surprise',i:'❓'}
+  ],
+  garnishes: [
+    {n:'無撒料',e:'No Garnish',i:'🚫'},{n:'蒜酥',e:'Crispy garlic',i:'🧄'},{n:'海苔絲',e:'Nori',i:'🟩'},
+    {n:'芝麻',e:'Sesame',i:'⚪'},{n:'堅果',e:'Nuts',i:'🥜'},{n:'七味粉',e:'Shichimi',i:'🌶️'}
+  ],
+};
+
+const BBQ_INC = '燒肉醬(已含)';
+
+const names = arr => arr.map(x => x.n);
+const isBBQ = p => !!(MENU.proteins.find(x => x.n === p) || {}).bbq;
+
+/* 配菜上限：基本 5 樣；選「無基底」+1；選「無主食/蔬食」+1（假設可疊加） */
+function topLimit(base, protein){
+  return 5 + (base === '無基底' ? 1 : 0) + (protein === '無主食/蔬食' ? 1 : 0);
+}
+
+/* 組成訂單文字（人看得懂，也供彙整解析） */
+function buildOrderText(o){
+  return [o.name, o.base, o.tops.join('、'), o.protein, o.sauce, o.garnish].join('｜');
+}
+
+</script>
+
+<!-- ============ 介面 ============ -->
+<script id="ui">
+/* 收單設定：部署 Apps Script 後，把「網頁應用程式網址」貼到 SUBMIT_URL。
+   留空時，確認頁不會出現「送出」按鈕。SUBMIT_KEY 須與 Code.gs 的 KEY 相同。 */
+const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbxPYWLl_7W_Lz_zYq-Cqc5-a_aILzO-R-sSZAm-rfiSbvszhv5PdxdSHmbiNvEMwnML/exec';
+const SUBMIT_KEY = '4fe04cbfb119be73a2fe1a8f';
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const STEPS = ['姓名與基底','主食','配菜','醬料','灑料','確認'];
+let S = {step:0, name:'', base:null, protein:null, tops:[], sauce:null, garnish:null};
+
+function toast(msg){ const t = $('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 1800); }
+const tagHtml = tags => (tags || []).length ? '<div class="badges">' + tags.map(t => `<span class="b ${t[0]}">${esc(t[1])}</span>`).join('') + '</div>' : '';
+function card(it, sel, dis, attrs){
+  return `<button class="card ${sel ? 'sel' : ''} ${dis ? 'dis' : ''}" ${dis ? 'aria-disabled="true"' : ''} ${attrs}>
+    <span class="ic">${it.i || ''}</span><span class="n">${esc(it.n)}</span><span class="e">${esc(it.e || '')}</span>${tagHtml(it.tags)}</button>`;
+}
+
+/* 送出訂單到 Apps Script（寫入試算表）。
+   用 no-cors + text/plain 避開預檢請求；回應為 opaque，無法讀取內容，故以「請求未報錯」視為已送出。 */
+async function submitOrder(){
+  if (!SUBMIT_URL || S.sending) return;
+  const o = orderObj();
+  if (S.sentText === buildOrderText(o)) return;          // 同一份訂單已送出，不重複送
+  const payload = {key:SUBMIT_KEY, name:o.name, base:o.base, tops:o.tops.join('、'), protein:o.protein,
+                   sauce:o.sauce, garnish:o.garnish, text:buildOrderText(o)};
+  S.sending = true; render();
+  try {
+    await fetch(SUBMIT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload)});
+    S.sentText = payload.text; toast('已送出');
+  } catch(e){
+    toast('送出失敗，請稍後再試');
+  }
+  S.sending = false; render();
+}
+
+function limit(){ return topLimit(S.base, S.protein); }
+function trimTops(){ S.tops = S.tops.slice(0, limit()); }
+
+function valid(){
+  switch (S.step){
+    case 0: return S.name.trim() && S.base;
+    case 1: return !!S.protein;
+    case 2: return S.tops.length === limit();
+    case 3: return !!S.sauce;
+    case 4: return !!S.garnish;
+    default: return true;
+  }
+}
+
+function orderObj(){
+  return {name:S.name.trim(), base:S.base, tops:S.tops, protein:S.protein, sauce:S.sauce, garnish:S.garnish};
+}
+
+function renderOrder(){
+  const dots = '<div class="dots">' + STEPS.map((_, i) => `<i class="${i <= S.step ? 'on' : ''}"></i>`).join('') + '</div>';
+  let h = dots, st = S.step;
+  if (st === 0){
+    h += `<h2>你是誰？選基底</h2><p class="sub">基底選 1 樣</p>
+      <input type="text" id="nameIn" placeholder="輸入姓名" value="${esc(S.name)}" maxlength="20" autocomplete="off" style="margin-bottom:14px">
+      <div class="grid">${MENU.bases.map(b => card(b, S.base === b.n, false, `data-act="base" data-v="${esc(b.n)}"`)).join('')}</div>`;
+  } else if (st === 1){
+    h += `<h2>選主食</h2><p class="sub">主食選 1 樣</p>
+      <div class="grid">${MENU.proteins.map(p => card(p, S.protein === p.n, false, `data-act="protein" data-v="${esc(p.n)}"`)).join('')}</div>`;
+  } else if (st === 2){
+    const lim = limit(), n = S.tops.length, full = n >= lim;
+    h += `<h2>選配菜<span class="counter ${n === lim ? 'full' : ''}">${n}/${lim}</span></h2>
+      <p class="sub">${lim > 5 ? '因選了無基底／蔬食，配菜可多選到 ' + lim + ' 樣。' : '配菜選 ' + lim + ' 樣。'}點一下選取，再點一下取消。</p>
+      <div class="grid">${MENU.tops.map(t => {
+        const sel = S.tops.includes(t.n);
+        return card(t, sel, full && !sel, `data-act="top" data-v="${esc(t.n)}"`);
+      }).join('')}</div>`;
+  } else if (st === 3){
+    h += `<h2>選醬料</h2><p class="sub">醬料選 1 樣</p>
+      <div class="grid">${MENU.sauces.map(x => card(x, S.sauce === x.n, false, `data-act="sauce" data-v="${esc(x.n)}"`)).join('')}</div>`;
+  } else if (st === 4){
+    h += `<h2>選灑料</h2><p class="sub">灑料選 1 樣</p>
+      <div class="grid">${MENU.garnishes.map(x => card(x, S.garnish === x.n, false, `data-act="garnish" data-v="${esc(x.n)}"`)).join('')}</div>`;
+  } else {
+    const o = orderObj(), text = buildOrderText(o);
+    h += `<h2>確認訂單</h2><p class="sub">確認無誤後，按「送出」。</p>
+      <div class="sum">
+        <div><span>姓名</span><span>${esc(o.name)}</span></div>
+        <div><span>基底</span><span>${esc(o.base)}</span></div>
+        <div><span>主食</span><span>${esc(o.protein)}</span></div>
+        <div><span>配菜</span><span>${esc(o.tops.join('、'))}</span></div>
+        <div><span>醬料</span><span>${esc(o.sauce)}</span></div>
+        <div><span>灑料</span><span>${esc(o.garnish)}</span></div>
+      </div>
+      ${SUBMIT_URL ? `<button class="btn" data-act="submit" style="width:100%;margin-bottom:10px" ${(S.sending || S.sentText === text) ? 'disabled' : ''}>${S.sentText === text ? '已送出 ✓' : (S.sending ? '送出中…' : '送出')}</button>
+        ${S.sentText === text ? '<p class="sub" style="color:var(--ok)">訂單已送出。若要更改，請按「重新點餐」，重新選擇後再送出，以最後一筆為準。</p>' : ''}` : ''}
+      <button class="btn ghost" data-act="reset" style="width:100%">重新點餐</button>`;
+  }
+  $('app').innerHTML = h;
+  const back = st > 0 ? `<button class="btn ghost" data-act="back">上一步</button>` : '';
+  let nextLabel = st === 4 ? '看訂單' : '下一步';
+  let hint = '';
+  if (st === 2 && S.tops.length < limit()) hint = `（還差 ${limit() - S.tops.length} 樣）`;
+  const next = st < 5 ? `<button class="btn" data-act="next" ${valid() ? '' : 'disabled'}>${nextLabel}${hint}</button>` : '';
+  $('navIn').innerHTML = back + next;
+  $('nav').style.display = (st === 5 && !back) ? 'none' : '';
+  const ni = $('nameIn');
+  if (ni) ni.addEventListener('input', () => { S.name = ni.value; const nb = document.querySelector('[data-act=next]'); if (nb) nb.disabled = !valid(); });
+}
+
+function render(){
+  renderOrder();
+  window.scrollTo(0, 0);
+}
+
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if (!el) return;
+  const act = el.dataset.act, v = el.dataset.v;
+  if (el.classList.contains('dis')) return;
+  const toggle = (arr, x) => { const i = arr.indexOf(x); if (i >= 0) arr.splice(i, 1); else arr.push(x); };
+  switch (act){
+    case 'base': S.base = v; trimTops(); render(); break;
+    case 'protein': S.protein = v; S.sauce = isBBQ(v) ? BBQ_INC : null; trimTops(); render(); break;
+    case 'top':
+      if (!S.tops.includes(v) && S.tops.length >= limit()) break;   // 已滿，不可再選
+      toggle(S.tops, v); render(); break;
+    case 'sauce': S.sauce = v; render(); break;
+    case 'garnish': S.garnish = v; render(); break;
+    case 'next': if (valid()){ S.step++; if (S.step === 3 && isBBQ(S.protein)) S.step++; render(); } break;   // 燒肉已含燒肉醬，略過醬料步驟
+    case 'back': S.step--; if (S.step === 3 && isBBQ(S.protein)) S.step--; render(); break;
+    case 'submit': submitOrder(); break;
+    case 'reset': S = {step:0, name:'', base:null, protein:null, tops:[], sauce:null, garnish:null}; render(); break;
+  }
+});
+render();
+</script>
+</body>
+</html>
